@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <rect width="256" height="256" rx="56" fill="#1a1a2e"/>
+  
+  <!-- Document Shape -->
+  <path d="M75 50 h70 l45 45 v101 a10 10 0 0 1 -10 10 h-105 a10 10 0 0 1 -10 -10 z" fill="#ffffff"/>
+  
+  <!-- Document Fold -->
+  <path d="M145 50 v35 a10 10 0 0 0 10 10 h35 z" fill="#e4e4e7"/>
+  
+  <!-- Letter F (Green) -->
+  <rect x="94" y="105" width="16" height="56" rx="2" fill="#4ade80" />
+  <rect x="110" y="105" width="22" height="16" rx="2" fill="#4ade80" />
+  <rect x="110" y="127" width="14" height="14" rx="2" fill="#4ade80" />
+  
+  <!-- Letter L (Dark) -->
+  <rect x="136" y="105" width="16" height="56" rx="2" fill="#1a1a2e" />
+  <rect x="152" y="145" width="22" height="16" rx="2" fill="#1a1a2e" />
+</svg>

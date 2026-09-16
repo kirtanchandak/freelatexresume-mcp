@@ -33,15 +33,23 @@ export default function LatexEditor({ initialValue, onChange }: LatexEditorProps
         EditorView.theme({
           "&": {
             height: "100%",
-            fontSize: "14px",
+            fontSize: "13px",
+            backgroundColor: "#1e1e2e",
           },
           ".cm-scroller": {
             overflow: "auto",
             fontFamily: "var(--font-geist-mono), 'Fira Code', 'Cascadia Code', monospace",
           },
           ".cm-gutters": {
-            backgroundColor: "#1e1e2e",
+            backgroundColor: "#181825",
             borderRight: "1px solid #313244",
+            color: "#585b70",
+          },
+          ".cm-activeLineGutter": {
+            backgroundColor: "#313244",
+          },
+          ".cm-activeLine": {
+            backgroundColor: "#2a2a3d",
           },
         }),
       ],

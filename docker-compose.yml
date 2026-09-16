@@ -17,3 +17,5 @@ services:
     environment:
       - NODE_ENV=development
       - PORT=3005
+      # Local mode is enabled so MCP works, but it now supports multiple files!
+      - NEXT_PUBLIC_STORAGE_MODE=filesystem

@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FreeLaTeX Resume Builder
 
-## Getting Started
+A modern, fast, and local-first LaTeX resume editor with real-time PDF compilation, designed to work seamlessly with AI tools like Cursor via the Model Context Protocol (MCP).
 
-First, run the development server:
+## ✨ Features
+
+- **No Local Dependencies:** You don't need to install massive TeX Live distributions on your Mac. Everything runs perfectly inside a lightweight Docker container.
+- **Real-time Compilation:** Instant PDF rendering as you type using `pdfLaTeX`.
+- **Dual-Mode Architecture:** 
+  - **Local Mode:** Syncs perfectly to a local `resume.tex` file on your machine, allowing AI agents to edit your resume for you.
+  - **SaaS (PROD) Mode:** A multi-file, sandboxed `localStorage` environment safe for public internet deployment.
+- **AI Ready (MCP):** Comes with a built-in Server-Sent Events (SSE) MCP server so AI editors like Cursor can natively read and write your LaTeX code.
+
+---
+
+## 🚀 Quickstart
+
+1. **Install Docker** on your machine.
+2. Clone this repository.
+3. Run the following command:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+docker compose up --build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. Open your browser to [http://localhost:3005](http://localhost:3005).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🏗️ Architecture & Storage Modes
 
-## Learn More
+This application dynamically adapts based on where it is running.
 
-To learn more about Next.js, take a look at the following resources:
+### 1. Local Mode (Filesystem)
+By default, the `docker-compose.yml` file contains the `NEXT_PUBLIC_STORAGE_MODE=filesystem` environment variable. 
+In this mode:
+- The app locks to a single file (`main.tex`).
+- Every keystroke automatically saves directly to the `resume.tex` file on your actual hard drive.
+- This is required for the MCP server to function.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 2. PROD Mode (Browser LocalStorage)
+If you deploy this app to Vercel, Railway, or comment out the environment variable in `docker-compose.yml`, the app switches to SaaS mode.
+In this mode:
+- The app uses the user's browser `localStorage`.
+- Users are greeted with a dummy "John Doe" template.
+- Users get a **Tabs UI** allowing them to create, edit, and delete multiple files (`cover_letter.tex`, etc.).
+- Your backend files are never touched.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 🤖 Connecting to Cursor (MCP)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+If you want to use Cursor to automatically write and format your LaTeX resume, you can connect the built-in MCP server.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Ensure the app is running locally via Docker (Local Mode must be enabled).
+2. Open **Cursor Settings** (`Cmd + ,`).
+3. Navigate to **Features > MCP**.
+4. Click **+ Add New MCP Server**.
+5. Configure it as follows:
+   - **Name:** `latex-resume`
+   - **Type:** `sse`
+   - **URL:** `http://localhost:3005/api/mcp`
+6. Click **Save**. (You should see a green dot 🟢 appear).
+
+**How to use it:**
+Open Cursor Composer (`Cmd + I`) and type: 
+> *"Use the latex-resume tools to read my resume, and format my new job at OpenAI into the experience section."*
+
+The AI will pull your code, write the LaTeX, and save it. Your browser will instantly update!

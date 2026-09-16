@@ -34,10 +34,9 @@ export async function POST(req: NextRequest) {
     // Write the LaTeX source to a file
     await writeFile(texPath, latex, "utf-8");
 
-    // Run xelatex (two passes to resolve references)
-    // xelatex is used instead of pdflatex for full Unicode support (accents, emoji, etc.)
+    // Run pdflatex (two passes to resolve references)
     try {
-      await execFileAsync("xelatex", [
+      await execFileAsync("pdflatex", [
         "-interaction=nonstopmode",
         "-halt-on-error",
         "-output-directory",
@@ -46,7 +45,7 @@ export async function POST(req: NextRequest) {
       ], { timeout: 30000 });
 
       // Second pass for references/TOC
-      await execFileAsync("xelatex", [
+      await execFileAsync("pdflatex", [
         "-interaction=nonstopmode",
         "-halt-on-error",
         "-output-directory",
