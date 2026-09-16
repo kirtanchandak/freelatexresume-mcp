@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    # Mount the local directory to /app in the container for hot-reloading
+    volumes:
+      - .:/app
+      # Prevent local node_modules from overwriting the container's node_modules
+      - /app/node_modules
+      # Prevent local .next folder from interfering
+      - /app/.next
+    # Override the default production start command to run the dev server
+    command: npm run dev
+    environment:
+      - NODE_ENV=development
