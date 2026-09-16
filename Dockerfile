@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y \
     texlive-fonts-recommended \
     texlive-fonts-extra \
     texlive-latex-extra \
+    texlive-xetex \
     && rm -rf /var/lib/apt/lists/*
 
 # Step 2: Set up the Node.js application

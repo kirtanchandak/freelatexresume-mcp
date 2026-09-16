@@ -9,7 +9,7 @@ const execFileAsync = promisify(execFile);
 
 // Ensure common TeX install locations are on PATH for local dev.
 // Node.js server processes don't inherit the user's full shell PATH.
-// In production, you'd use a Docker image with TeX Live or a third-party API.
+// In production, use a Docker image with TeX Live (xelatex handles Unicode natively).
 const TEX_PATHS = "/Library/TeX/texbin:/usr/local/texlive/2026/bin/universal-darwin";
 process.env.PATH = `${TEX_PATHS}:${process.env.PATH || ""}`;
 
@@ -34,9 +34,10 @@ export async function POST(req: NextRequest) {
     // Write the LaTeX source to a file
     await writeFile(texPath, latex, "utf-8");
 
-    // Run pdflatex (two passes to resolve references)
+    // Run xelatex (two passes to resolve references)
+    // xelatex is used instead of pdflatex for full Unicode support (accents, emoji, etc.)
     try {
-      await execFileAsync("pdflatex", [
+      await execFileAsync("xelatex", [
         "-interaction=nonstopmode",
         "-halt-on-error",
         "-output-directory",
@@ -45,7 +46,7 @@ export async function POST(req: NextRequest) {
       ], { timeout: 30000 });
 
       // Second pass for references/TOC
-      await execFileAsync("pdflatex", [
+      await execFileAsync("xelatex", [
         "-interaction=nonstopmode",
         "-halt-on-error",
         "-output-directory",

@@ -1,0 +1,239 @@
+%-------------------------
+% Resume in Latex
+% Author : Jake Gutierrez
+% Based off of: https://github.com/sb2nov/resume
+% License : MIT
+%------------------------
+
+\documentclass[letterpaper,11pt]{article}
+
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\input{glyphtounicode}
+
+
+%----------FONT OPTIONS----------
+% sans-serif
+% \usepackage[sfdefault]{FiraSans}
+% \usepackage[sfdefault]{roboto}
+% \usepackage[sfdefault]{noto-sans}
+% \usepackage[default]{sourcesanspro}
+
+% serif
+% \usepackage{CormorantGaramond}
+% \usepackage{charter}
+
+
+\pagestyle{fancy}
+\fancyhf{} % clear all header and footer fields
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Adjust margins
+\addtolength{\oddsidemargin}{-0.5in}
+\addtolength{\evensidemargin}{-0.5in}
+\addtolength{\textwidth}{1in}
+\addtolength{\topmargin}{-.5in}
+\addtolength{\textheight}{1.0in}
+
+\urlstyle{same}
+
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+% Sections formatting
+\titleformat{\section}{
+  \vspace{-4pt}\scshape\raggedright\large
+}{}{0em}{}[\color{black}\titlerule \vspace{-5pt}]
+
+% Ensure that generate pdf is machine readable/ATS parsable
+\pdfgentounicode=1
+
+%-------------------------
+% Custom commands
+\newcommand{\resumeItem}[1]{
+  \item\small{
+    {#1 \vspace{-2pt}}
+  }
+}
+
+\newcommand{\resumeSubheading}[4]{
+  \vspace{-2pt}\item
+    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #2 \\
+      \textit{\small#3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubSubheading}[2]{
+    \item
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+      \textit{\small#1} & \textit{\small #2} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeProjectHeading}[2]{
+    \item
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+      \small#1 & #2 \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubItem}[1]{\resumeItem{#1}\vspace{-4pt}}
+
+\renewcommand\labelitemii{$\vcenter{\hbox{\tiny$\bullet$}}$}
+
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.15in, label={}]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-5pt}}
+
+%-------------------------------------------
+%%%%%%  RESUME STARTS HERE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+
+%----------HEADING----------
+% \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}r}
+%   \textbf{\href{http://sourabhbajaj.com/}{\Large Sourabh Bajaj}} & Email : \href{mailto:sourabh@sourabhbajaj.com}{sourabh@sourabhbajaj.com}\\
+%   \href{http://sourabhbajaj.com/}{http://www.sourabhbajaj.com} & Mobile : +1-123-456-7890 \\
+% \end{tabular*}
+
+\begin{center}
+    \textbf{\Huge \scshape Kirtan Chandak} \\ \vspace{1pt}
+    \small +918799876476 $|$ \href{mailto:kirtanmchandak5@gmail.com}{\underline{ kirtanmchandak5@gmail.com}} $|$ 
+    \href{https://linkedin.com/in/kirtan-chandak}{\underline{linkedin.com/in/kirtan-chandak}} $|$
+    \href{https://github.com/kirtanchandak}{\underline{github.com/kirtanchandak}}
+\end{center}
+
+
+%-----------EDUCATION-----------
+\section{Education}
+  \resumeSubHeadingListStart
+    \resumeSubheading
+      {Savitribai Phule Pune University}{Pune, IN}
+      {Bachelor of Technology in Computer Engineering}{Dec. 2022 -- May 2025}
+  \resumeSubHeadingListEnd
+
+
+%-----------EXPERIENCE-----------
+\section{Experience}
+  \resumeSubHeadingListStart
+
+    \resumeSubheading
+      {Software Developer}{November 2024 -- Present}
+      {Kuration AI}{Remote, HongKong}
+      \resumeItemListStart
+        \resumeItem{Built internal tools integrating SerpApi to extract structured search engine results and automate list-generation workflows for internal data enrichment.}
+        \resumeItem{Designed and implemented backend APIs powering an AI MCP chat system that performs real-time actions based on user queries.}
+        \resumeItem{Developed and maintained scalable Next.js + TypeScript components with structured state management using Zustand, ensuring type-safe data handling and error resilience.}
+        \resumeItem{Built advanced data tables with real-time editing, bulk operations, column configuration, and export features (CSV / Google Sheets) to support internal data workflows.}
+      \resumeItemListEnd
+
+        \resumeSubheading
+      {Google Summer of Code Contributor}{May 2025 -- September 2025}
+      {OpenFoodFacts}{Remote, Paris, Île-de-France, France}
+      \resumeItemListStart
+      \resumeItem{Designed and implemented tools and APIs that allow contributors to explore, search, and edit structured product data within the OpenFoodFacts ecosystem.}
+        \resumeItem{Built moderation and bulk-editing features including spam detection, conflict resolution, and batch updates to maintain data quality across the platform.}
+        \resumeItem{Developed a property generation wizard and role-based workflows to streamline contributor onboarding and structured data contributions.}
+        \resumeItem{Implemented a mobile-friendly suggestion system that accelerates product data entry and improves contribution accuracy.}
+      \resumeItemListEnd
+      
+% -----------Multiple Positions Heading-----------
+%    \resumeSubSubheading
+%     {Software Engineer I}{Oct 2014 - Sep 2016}
+%     \resumeItemListStart
+%        \resumeItem{Apache Beam}
+%          {Apache Beam is a unified model for defining both batch and streaming data-parallel processing pipelines}
+%     \resumeItemListEnd
+%    \resumeSubHeadingListEnd
+%-------------------------------------------
+
+       \resumeSubheading
+      {LFX Mentee (Product, Tech and Docs)}{June 2024 -- August 2024}
+      {Vitessio}{Remote, US}
+      \resumeItemListStart
+        \resumeItem{Reviewed and improved the getting-started guide, reducing setup errors by 25\% and significantly improving developer onboarding.}
+        \resumeItem{Conducted 15+ user interviews to gather insights from community users, leading to 15\% improvement in documentation usability.}
+        \resumeItem{Designed and implemented a community survey in collaboration with maintainers to gather structured feedback from developers.}
+      \resumeItemListEnd
+
+  \resumeSubHeadingListEnd
+
+
+%-----------PROJECTS-----------
+\section{Projects}
+    \resumeSubHeadingListStart
+  \resumeProjectHeading
+    {%
+      \begin{tabular*}{\textwidth}{@{}l@{\extracolsep{\fill}}r@{}}
+        \textbf{Emix} $|$ \emph{Typescript, Python, FastAPI, Next.js, PostgreSQL, Docker} &
+         \href{https://github.com/flex3-org/emix}{\underline{GitHub}} \\
+      \end{tabular*}
+    }
+    
+          \resumeItemListStart
+          \resumeItem{Developed Emix, an AI-powered tool designed to streamline the creation of MJML email templates.}
+            \resumeItem{Developed an AI SAAS full-stack web application using Next.js for frontend and FastAPI for backend.}
+            \resumeItem{Implemented a seamless payment process using Razorpay APIs for credit purchases, facilitating easy transactions.}
+            \resumeItem{Implemented Clerk OAuth for user authentication and PostgreSQL for database.}
+            \resumeItem{Utilized Docker for containerization and deployed the application on Azure Container Apps and Vercel.}
+          \resumeItemListEnd
+
+            \resumeProjectHeading
+    {%
+      \begin{tabular*}{\textwidth}{@{}l@{\extracolsep{\fill}}r@{}}
+        \textbf{jwt-toolkit-fast } $|$ \emph{Typescript, Node.js, Express.js, Next.js} &
+        \href{https://github.com/kirtanchandak/jwt-toolkit-fast}{\underline{GitHub}} \\
+      \end{tabular*}
+    }
+    
+          \resumeItemListStart
+          \resumeItem{ JavaScript module for JSON Object Signing and Encryption, providing support for JSON Web Tokens (JWT).}
+            \resumeItem{Implemented a Crypto Web API module to facilitate the JWT flow, ensuring secure token generation and validation.}
+            \resumeItem{Tested the NPM package with Next.js environment to verify user authentication functionality}
+          \resumeItemListEnd
+    \resumeSubHeadingListEnd
+
+
+
+%
+%-----------MISC-----------
+\section{ACHIEVEMENTS \& EXTRACURRICULAR}
+\begin{itemize}[leftmargin=0.15in, label={}, itemsep=0pt]  % Adjust itemsep here
+    \small{
+    \item{- Established and grew two developer communities at my university, each exceeding 1,000 members. Successfully
+    organized and led technical workshops and hackathons}
+    \item{- Won 4 hackathons - ETH Online 2025, Smart India Hackathon 2022, Hack This Fall 3.0 and @Waffle Hacks.}
+    \item{- Collaborated with a prominent YouTube creator (1 Million Subs) to produce content and reached out to sponsors.}
+\end{itemize}
+
+
+%-----------SKILLS-----------
+\section{Skills}
+\begin{itemize}[leftmargin=0.15in, label={}]
+    \small{
+    \item{
+     \textbf{Languages}{: Javascript, Typescript, Python, SQL (Postgres), HTML/CSS} \\
+     \textbf{Frameworks}{: React, Next.js, Node.js, FastAPI, Material-UI, Tailwind CSS} \\
+     \textbf{Others}{: REST APIs, API integrations, Docker, Linux environments, technical documentation} \\
+\end{itemize}
+
+
+
+%-------------------------------------------
+\end{document}
+
