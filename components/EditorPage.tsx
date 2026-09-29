@@ -3,7 +3,11 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import PdfPreview from "./PdfPreview";
+import AuthButton from "./AuthButton";
+import AiChatPanel from "./AiChatPanel";
+import { createClient } from "@/lib/supabase/client";
 import { defaultLatexTemplate } from "@/lib/defaultTemplate";
+import type { User } from "@supabase/supabase-js";
 
 const LatexEditor = dynamic(() => import("./LatexEditor"), { ssr: false });
 
@@ -49,6 +53,11 @@ export default function EditorPage() {
   const [compileError, setCompileError] = useState<string | null>(null);
   const [saveState, setSaveState] = useState<SaveState>("loading");
   
+  const [user, setUser] = useState<User | null>(null);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [resumeId, setResumeId] = useState<string | null>(null);
+  const supabaseRef = useRef(createClient());
+
   const [zoom, setZoom] = useState(100);
   const [splitPct, setSplitPct] = useState(50);
   const isDragging = useRef(false);
@@ -61,8 +70,64 @@ export default function EditorPage() {
   const activeFile = files.find(f => f.id === activeFileId);
   const latexSource = activeFile?.content || "";
 
-  // ── Load data on mount ────────────────────────────────────────────────────
+  // ── Auth listener ──────────────────────────────────────────────────────
   useEffect(() => {
+    const supabase = supabaseRef.current;
+    supabase.auth.getUser().then(({ data: { user: u } }) => setUser(u));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // ── Load data on mount / auth change ──────────────────────────────────
+  useEffect(() => {
+    const supabase = supabaseRef.current;
+
+    async function loadFromSupabase() {
+      const { data, error } = await supabase
+        .from("resumes")
+        .select("id, files")
+        .order("updated_at", { ascending: false })
+        .limit(1)
+        .single();
+      
+      if (!error && data) {
+        setResumeId(data.id);
+        const loadedFiles = data.files as FileState[];
+        if (loadedFiles.length > 0) {
+          setFiles(loadedFiles);
+          setActiveFileId(loadedFiles[0].id);
+        }
+        setSaveState("saved");
+      } else {
+        // No resume in DB yet — use localStorage fallback then migrate
+        loadFromLocalStorage();
+        // Force auto-save to run immediately to migrate data to Supabase
+        isFirstLoad.current = false;
+      }
+    }
+
+    function loadFromLocalStorage() {
+      const stored = localStorage.getItem("freelatex-files");
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (parsed.length > 0) {
+            setFiles(parsed);
+            setActiveFileId(parsed[0].id);
+            setSaveState("saved");
+            return;
+          }
+        } catch { /* ignore */ }
+      }
+      // Fallback: default template
+      const init = [{ id: "1", name: "main.tex", content: defaultLatexTemplate }];
+      setFiles(init);
+      setActiveFileId("1");
+      setSaveState("saved");
+    }
+
     if (isFileSystem) {
       // Local dev mode: load from backend API so MCP server can access it
       fetch("/api/resume")
@@ -78,29 +143,14 @@ export default function EditorPage() {
           setSaveState("saved"); 
         })
         .catch(() => setSaveState("unsaved"));
+    } else if (user) {
+      // Logged in: load from Supabase
+      loadFromSupabase();
     } else {
-      // PROD SaaS mode: load from browser localStorage
-      const stored = localStorage.getItem("freelatex-files");
-      if (stored) {
-        try {
-          const parsed = JSON.parse(stored);
-          if (parsed.length > 0) {
-            setFiles(parsed);
-            setActiveFileId(parsed[0].id);
-          }
-        } catch { /* ignore */ }
-      }
-      
-      // Fallback if empty
-      setFiles((prev) => {
-        if (prev.length > 0) return prev;
-        const init = [{ id: "1", name: "main.tex", content: defaultLatexTemplate }];
-        setActiveFileId("1");
-        return init;
-      });
-      setSaveState("saved");
+      // Anonymous: load from localStorage
+      loadFromLocalStorage();
     }
-  }, [isFileSystem]);
+  }, [isFileSystem, user]);
 
   // ── Auto-save (debounced 1 s) ─────────────────────────────────────────────
   useEffect(() => {
@@ -123,14 +173,42 @@ export default function EditorPage() {
           });
           setSaveState("saved");
         } catch { setSaveState("unsaved"); }
+      } else if (user) {
+        // Logged in: save to Supabase
+        const supabase = supabaseRef.current;
+        try {
+          if (resumeId) {
+            // Update existing resume
+            const { error } = await supabase
+              .from("resumes")
+              .update({ files: JSON.parse(JSON.stringify(files)), updated_at: new Date().toISOString() })
+              .eq("id", resumeId);
+            if (error) throw error;
+          } else {
+            // Create new resume
+            const { data, error } = await supabase
+              .from("resumes")
+              .insert({ user_id: user.id, files: JSON.parse(JSON.stringify(files)) })
+              .select("id")
+              .single();
+            if (error) throw error;
+            if (data) setResumeId(data.id);
+          }
+          setSaveState("saved");
+          // Also keep localStorage as backup
+          localStorage.setItem("freelatex-files", JSON.stringify(files));
+        } catch (err) { 
+          console.error("Save to Supabase failed:", err);
+          setSaveState("unsaved"); 
+        }
       } else {
-        // PROD: save to localStorage
+        // Anonymous: save to localStorage
         localStorage.setItem("freelatex-files", JSON.stringify(files));
         setSaveState("saved");
       }
     }, 1000);
     return () => { if (saveTimer.current) clearTimeout(saveTimer.current); };
-  }, [files, isFileSystem]);
+  }, [files, isFileSystem, user, resumeId]);
 
   const handleEditorChange = useCallback((newContent: string) => {
     if (!activeFileId) return;
@@ -233,8 +311,27 @@ export default function EditorPage() {
         <div className="h-4 w-px bg-zinc-700" />
         <div className="flex items-center gap-1.5">
           <span className={`h-2 w-2 rounded-full ${saveDot}`} />
-          <span className="text-xs text-zinc-400">{saveLabel} {isFileSystem ? "(Local FS)" : "(Browser LocalStorage)"}</span>
+          <span className="text-xs text-zinc-400">
+            {saveLabel} {isFileSystem ? "(Local FS)" : user ? "(Cloud)" : "(Browser)"}
+          </span>
         </div>
+        <div className="flex-1" />
+        {/* AI Chat toggle */}
+        <button
+          onClick={() => setChatOpen(!chatOpen)}
+          className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+            chatOpen
+              ? "bg-green-600/20 text-green-400 border border-green-500/30"
+              : "border border-zinc-700 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200"
+          }`}
+        >
+          <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+            <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+          </svg>
+          AI
+        </button>
+        <div className="h-4 w-px bg-zinc-700" />
+        <AuthButton />
       </header>
 
       {/* ── Main split area ──────────────────────────────────────────────── */}
@@ -365,6 +462,18 @@ export default function EditorPage() {
             <PdfPreview pdfUrl={pdfUrl} isLoading={isCompiling} error={compileError} zoom={zoom} />
           </div>
         </div>
+
+        {/* ══ AI Chat Panel (slide-over) ═══════════════════════════════ */}
+        {chatOpen && (
+          <div className="flex w-80 shrink-0 flex-col border-l border-zinc-700 bg-[#12121f]">
+            <AiChatPanel
+              latexSource={latexSource}
+              onLatexChange={handleEditorChange}
+              onClose={() => setChatOpen(false)}
+              user={user}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

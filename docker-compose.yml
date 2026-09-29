@@ -5,6 +5,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_SUPABASE_URL=https://yduxuuzzomngxotbfxiv.supabase.co
+        - NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkdXh1dXp6b21uZ3hvdGJmeGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAzOTczOTEsImV4cCI6MjEwNTk3MzM5MX0.2agedP4yYZGlxdQ2UXqmbwd4wPWirExOX748jpuS03I
     ports:
       - "3005:3005"
     volumes:
@@ -18,4 +21,6 @@ services:
       - NODE_ENV=development
       - PORT=3005
       # Local mode is enabled so MCP works, but it now supports multiple files!
-      - NEXT_PUBLIC_STORAGE_MODE=filesystem
+      # - NEXT_PUBLIC_STORAGE_MODE=filesystem
+    env_file:
+      - .env.local
