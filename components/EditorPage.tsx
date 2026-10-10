@@ -56,6 +56,8 @@ export default function EditorPage() {
   const [user, setUser] = useState<User | null>(null);
   const [chatOpen, setChatOpen] = useState(false);
   const [resumeId, setResumeId] = useState<string | null>(null);
+  const [editingFileId, setEditingFileId] = useState<string | null>(null);
+  const [editingFileName, setEditingFileName] = useState("");
   const supabaseRef = useRef(createClient());
 
   const [zoom, setZoom] = useState(100);
@@ -233,6 +235,29 @@ export default function EditorPage() {
     });
   }, [activeFileId]);
 
+  const startRenaming = useCallback((e: React.MouseEvent, id: string, name: string) => {
+    e.stopPropagation();
+    setEditingFileId(id);
+    setEditingFileName(name);
+  }, []);
+
+  const finishRenaming = useCallback(() => {
+    if (editingFileId && editingFileName.trim()) {
+      let finalName = editingFileName.trim();
+      if (!finalName.endsWith(".tex")) finalName += ".tex";
+      setFiles(prev => prev.map(f => f.id === editingFileId ? { ...f, name: finalName } : f));
+    }
+    setEditingFileId(null);
+  }, [editingFileId, editingFileName]);
+
+  const handleRenameKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      finishRenaming();
+    } else if (e.key === "Escape") {
+      setEditingFileId(null);
+    }
+  }, [finishRenaming]);
+
   // Cleanup blob URLs
   useEffect(() => () => { if (prevPdfUrl.current) URL.revokeObjectURL(prevPdfUrl.current); }, []);
 
@@ -346,6 +371,7 @@ export default function EditorPage() {
               <div 
                 key={f.id}
                 onClick={() => setActiveFileId(f.id)}
+                onDoubleClick={(e) => startRenaming(e, f.id, f.name)}
                 className={`flex h-full items-center gap-1.5 rounded-t px-3 text-xs cursor-pointer select-none border-t-2 ${
                   activeFileId === f.id 
                     ? "border-t-green-400 bg-[#1e1e35] text-zinc-200" 
@@ -353,7 +379,19 @@ export default function EditorPage() {
                 }`}
               >
                 <svg className="h-3 w-3 text-orange-400" viewBox="0 0 16 16" fill="currentColor"><path d="M9.5 1L14 5.5V15H2V1h7.5zM9 2H3v12h10V6H9V2z"/></svg>
-                {f.name}
+                {editingFileId === f.id ? (
+                  <input
+                    autoFocus
+                    type="text"
+                    value={editingFileName}
+                    onChange={(e) => setEditingFileName(e.target.value)}
+                    onBlur={finishRenaming}
+                    onKeyDown={handleRenameKeyDown}
+                    className="bg-[#12121f] text-zinc-100 outline-none w-24 border border-green-500/50 rounded px-1"
+                  />
+                ) : (
+                  f.name
+                )}
                 {files.length > 1 && (
                   <button onClick={(e) => removeFile(e, f.id)} className="ml-1 text-zinc-500 hover:text-red-400">✕</button>
                 )}
@@ -469,6 +507,7 @@ export default function EditorPage() {
             <AiChatPanel
               latexSource={latexSource}
               onLatexChange={handleEditorChange}
+              onCompile={handleCompile}
               onClose={() => setChatOpen(false)}
               user={user}
             />

@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  const { messages, provider = "openai" } = await req.json();
+  const { messages, provider = "openai", model: requestedModel } = await req.json();
 
   if (!messages || !Array.isArray(messages)) {
     return new Response(JSON.stringify({ error: "messages array is required" }), {
@@ -56,10 +56,11 @@ export async function POST(req: NextRequest) {
 
   const defaults = PROVIDER_DEFAULTS[provider] || PROVIDER_DEFAULTS.openai;
   const baseUrl = keyRow.base_url || defaults.baseUrl;
+  const model = requestedModel || defaults.model;
 
   // Handle Anthropic separately (different API format)
   if (provider === "anthropic") {
-    return handleAnthropicStream(apiKey, baseUrl, messages, defaults.model);
+    return handleAnthropicStream(apiKey, baseUrl, messages, model);
   }
 
   // OpenAI-compatible streaming
@@ -70,7 +71,7 @@ export async function POST(req: NextRequest) {
       Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: defaults.model,
+      model,
       messages,
       stream: true,
     }),
